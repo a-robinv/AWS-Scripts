@@ -29,6 +29,6 @@ aws ec2 describe-instances \
 
 #MEMORY UTILIZATION
 
-while read instance_id; read instance_name;
-do aws cloudwatch put-metric-alarm --alarm-name "${CLIENT_ACCOUNT} - P3 - Critical Memory Utilization on $instance_id ($instance_name)" --alarm-description "Alarm when Memory exceeds threshold" --metric-name mem_used_percent --namespace CWAgent --statistic Average --period $CRITICAL_PERIOD --threshold $CRITICAL_MEMORY --comparison-operator GreaterThanThreshold --dimensions "Name=InstanceId,Value=$instance_id" --evaluation-periods $CRITICAL_EVALPERIOD --alarm-actions ${SNS_TOPIC} --unit Percent --region ${REGION};
+while read instance_id; read image_id; read instance_type; read instance_name;
+do aws cloudwatch put-metric-alarm --alarm-name "${CLIENT_ACCOUNT} - P3 - Critical Memory Utilization on ${instance_id} (${instance_name})" --alarm-description "Alarm when Memory exceeds threshold" --metric-name mem_used_percent --namespace CWAgent --statistic Average --period ${CRITICAL_PERIOD} --threshold ${CRITICAL_MEMORY} --comparison-operator GreaterThanThreshold --dimensions Name='InstanceId',Value=${instance_id} Name='ImageId',Value=${image_id} Name='InstanceType',Value=${instance_type} --evaluation-periods ${CRITICAL_EVALPERIOD} --alarm-actions ${SNS_TOPIC} --unit Percent --region ${REGION};
 done < create-cwmemoryalarm-linux-platform.txt;
