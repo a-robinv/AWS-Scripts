@@ -1,5 +1,6 @@
 #!/bin/bash
-
+# Example command for using this script: 
+# ./cleanmetadata metadata.txt
 # Check if a file path is provided as an argument
 if [ $# -ne 1 ]; then
   echo "Usage: $0 <file>"
@@ -25,4 +26,3 @@ mv "$temp_file" "$1"
 rm "$temp_file"
 
 echo "Empty new lines removed from $1."
-
