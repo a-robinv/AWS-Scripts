@@ -1,0 +1,19 @@
+#Set the value of parameters
+read -p "Enter Customer Account Name(CLIENTNAME-ALIAS): " CLIENT_ACCOUNT
+read -p "Enter SNS TOPIC " SNS_TOPIC
+read -p "Enter Region " REGION
+read -p "Enter Environment " ENVIRONMENT
+
+CRITICAL_CPU="80"
+CRITICAL_MEMORY="80"
+CRITICAL_DISK="80"
+CRITICAL_PERIOD="60"
+CRITICAL_EVALPERIOD="1"
+aws ec2 describe-instances \
+  --filters Name=platform-details,Values="Linux/UNIX" "Name=tag:Environment,Values=${ENVIRONMENT}" \
+  --query 'Reservations[*].Instances[*].[InstanceId, ImageId, InstanceType, Tags[?Key==`Name`].Value]' \
+  --output text \
+  --region ${REGION} \
+  | awk '{printf "%s\n%s\n%s\n%s\n", $1, $2, $3, $4}' \
+  >> create-cwmemoryalarm-linux-platform.txt
+
