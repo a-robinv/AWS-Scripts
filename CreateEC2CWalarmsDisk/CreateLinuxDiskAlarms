@@ -1,0 +1,40 @@
+#Set the value of parameters
+read -p "Enter Customer Account Name(CLIENTNAME-ALIAS): " CLIENT_ACCOUNT
+read -p "Enter SNS TOPIC: " SNS_TOPIC
+read -p "Enter Region: " REGION
+read -p "Enter Environment: " ENVIRONMENT
+read -p "Enter Priority Level: " PRIORITY
+
+CRITICAL_CPU="80"
+CRITICAL_MEMORY="80"
+CRITICAL_DISK="80"
+CRITICAL_PERIOD="60"
+CRITICAL_EVALPERIOD="1"
+
+aws ec2 describe-instances \
+  --filters Name=platform-details,Values="Linux/UNIX" "Name=tag:Environment,${ENVIRONMENT}" \
+  --query 'Reservations[*].Instances[*].[Tags[?Key==`Name`].Value | [0], InstanceId, ImageId, InstanceType]' \
+  --output text \
+  --region ap-southeast-1 \
+  | awk '{printf "%s\n%s\n%s\n%s\n", $1, $2, $3, $4}' \
+  >> metadata.txt
+
+aws ec2 describe-instances \
+  --filters Name=platform-details,Values="Red Hat Enterprise Linux" "Name=tag:Environment,Values=${ENVIRONMENT}" \
+  --query 'Reservations[*].Instances[*].[Tags[?Key==`Name`].Value | [0], InstanceId, ImageId, InstanceType]' \
+  --output text \
+  --region ap-southeast-1 \
+  | awk '{printf "%s\n%s\n%s\n%s\n", $1, $2, $3, $4}' \
+  >> metadata.txt
+
+aws ec2 describe-instances \
+  --filters Name=platform-details,Values="SUSE Linux" "Name=tag:Environment,Values=${ENVIRONMENT}" \
+  --query 'Reservations[*].Instances[*].[Tags[?Key==`Name`].Value | [0], InstanceId, ImageId, InstanceType]' \
+  --output text \
+  --region ap-southeast-1 \
+  | awk '{printf "%s\n%s\n%s\n%s\n", $1, $2, $3, $4}' \
+  >> metada.txt
+
+while read instance_name; read instance_id; read image_id; read instance_type;
+do aws cloudwatch put-metric-alarm --alarm-name "${CLIENT_ACCOUNT} - ${PRIORITY} - Critical Disk Utilization on ${instance_id} (${instance_name})" --alarm-description "Alarm when disk usage exceeds threshold" --metric-name disk_used_percent --namespace CWAgent --statistic Average --period $CRITICAL_PERIOD --threshold $CRITICAL_DISK --comparison-operator GreaterThanThreshold --dimensions Name='InstanceId',Value=${instance_id} Name='ImageId',Value=${image_id} Name='InstanceType',Value=${instance_type} Name='path',Value='/' Name='device',Value='nvme0n1p1' Name='fstype',Value='xfs' --evaluation-periods ${CRITICAL_EVALPERIOD} --alarm-actions ${SNS_TOPIC} --unit Percent --region ${REGION};
+done < metadata.txt;
