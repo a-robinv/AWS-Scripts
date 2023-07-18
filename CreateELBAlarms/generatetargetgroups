@@ -12,3 +12,12 @@ aws elbv2 describe-load-balancers --region ap-southeast-1 --query "LoadBalancers
 while read ARN;
 do aws elbv2 describe-target-groups --query "TargetGroups[].TargetGroupName" --load-balancer-arn ${ARN} >> targetgroups.txt;
 done < arnlist.txt;
+
+
+
+
+
+# Generate ARN of LB
+# aws elbv2 describe-load-balancers --region ap-southeast-1 --query "LoadBalancers[].LoadBalancerArn" --output text
+# Generate AZ and LB Name
+# aws elbv2 describe-load-balancers --region ap-southeast-1 --query "LoadBalancers[].[AvailabilityZones[].ZoneName, LoadBalancerName]" --output text
