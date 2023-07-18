@@ -1,0 +1,28 @@
+#!/bin/bash
+# Example command for using this script: 
+# ./cleanmetadata metadata.txt
+# Check if a file path is provided as an argument
+if [ $# -ne 1 ]; then
+  echo "Usage: $0 <file>"
+  exit 1
+fi
+
+# Check if the file exists
+if [ ! -f "$1" ]; then
+  echo "File not found: $1"
+  exit 1
+fi
+
+# Create a temporary file
+temp_file=$(mktemp)
+
+# Remove empty new lines using sed
+sed '/^$/d' "$1" > "$temp_file"
+
+# Overwrite the original file with the modified content
+mv "$temp_file" "$1"
+
+# Cleanup temporary file
+rm "$temp_file"
+
+echo "Empty new lines removed from $1."
