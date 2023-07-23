@@ -1,0 +1,120 @@
+#Set the value of parameters
+read -p "Enter Customer Account Name(CLIENTNAME-ALIAS): " CLIENT_ACCOUNT
+read -p "Enter SNS TOPIC " SNS_TOPIC
+read -p "Enter Region " REGION
+CRITICAL_CPU="80"
+CRITICAL_MEMORY="80"
+CRITICAL_DISK="80"
+CRITICAL_PERIOD="60"
+CRITICAL_EVALPERIOD="1"
+
+
+#List EC2 instance with windows platform
+aws ec2 describe-instances --filters "Name=platform,Values=windows" --query "Reservations[*].Instances[*].[InstanceId]" --output text --region ${REGION} >> windows-platform.txt
+
+#Create Tags OS = WINDOWS
+while read instance_id;
+do aws ec2 create-tags --resources $instance_id --tags 'Key="PLATFORM",Value=WINDOWS' --region ${REGION};
+done < windows-platform.txt
+
+
+#List EC2 instance with Linux platform details
+aws ec2 describe-instances --filters Name=platform-details,Values="Linux/UNIX" --query "Reservations[*].Instances[*].[InstanceId]" --output text --region ${REGION} >> linux-platform.txt
+
+#Create Tags Linux Instance
+while read instance_id;
+do aws ec2 create-tags --resources $instance_id --tags 'Key="PLATFORM",Value=LINUX' --region ${REGION};
+done < linux-platform.txt
+
+
+#List EC2 instance with SUSE platform
+aws ec2 describe-instances --filters Name=platform-details,Values="SUSE Linux" --query "Reservations[*].Instances[*].[InstanceId]" --output text --region ${REGION} >> suse-platform.txt
+
+#Create Tags Suse Instance
+while read instance_id;
+do aws ec2 create-tags --resources $instance_id --tags 'Key="PLATFORM",Value=SUSE' --region ${REGION};
+done < suse-platform.txt
+
+
+#List EC2 instance with RHEL platform
+aws ec2 describe-instances --filters Name=platform-details,Values="Red Hat Enterprise Linux" --query "Reservations[*].Instances[*].[InstanceId]" --output text --region ${REGION} >> rhel-platform.txt
+
+#Create Tags RHEL Instance
+while read instance_id;
+do aws ec2 create-tags --resources $instance_id --tags 'Key="PLATFORM",Value=SUSE' --region ${REGION};
+done < rhel-platform.txt
+
+
+#Create a List of EC2 instances with Instance ID and Name
+aws ec2 describe-instances --filters "Name=tag:PLATFORM,Values=LINUX" --output text --query 'Reservations[*].Instances[*].[InstanceId,Tags[?Key==`Name`].Value]' --region ${REGION} >> create-alarms-linux-platform.txt
+
+
+#Create a List of EC2 instances with Instance ID and Name
+aws ec2 describe-instances --filters "Name=tag:PLATFORM,Values=WINDOWS" --output text --query 'Reservations[*].Instances[*].[InstanceId,Tags[?Key==`Name`].Value]' --region ${REGION} >> create-alarms-windows-platform.txt
+
+
+#Create CloudWatch alarms for Windows Platform
+
+#CPU UTILIZATION 
+while read instance_id; read instance_name; 
+do aws cloudwatch put-metric-alarm --alarm-name "${CLIENT_ACCOUNT} - P2 - Critical CPU Utilization on $instance_id ($instance_name)" --alarm-description "Alarm when CPU exceeds 90 percent" --metric-name CPUUtilization --namespace AWS/EC2 --statistic Average --period $CRITICAL_PERIOD --threshold $CRITICAL_CPU --comparison-operator GreaterThanThreshold --dimensions "Name=InstanceId,Value=$instance_id" --evaluation-periods $CRITICAL_EVALPERIOD --alarm-actions ${SNS_TOPIC} --unit Percent --region ${REGION}; 
+done < create-alarms-windows-platform.txt;  
+
+ 
+
+#STATUS CHECK FAILED 
+while read instance_id; read instance_name; 
+do aws cloudwatch put-metric-alarm --alarm-name "${CLIENT_ACCOUNT} - P1 - Critical Status Check Failed on $instance_id ($instance_name)" --alarm-description "Alarm when instance has status check failure" --metric-name StatusCheckFailed --namespace AWS/EC2 --statistic Maximum --period $CRITICAL_PERIOD --threshold 0 --comparison-operator GreaterThanThreshold --dimensions "Name=InstanceId,Value=$instance_id" --evaluation-periods $CRITICAL_EVALPERIOD --alarm-actions ${SNS_TOPIC} --unit Count --region ${REGION}; 
+done < create-alarms-windows-platform.txt; 
+
+  
+
+#MEMORY UTILIZATION 
+while read instance_id; read instance_name; 
+do aws cloudwatch put-metric-alarm --alarm-name "${CLIENT_ACCOUNT} - P2 - Critical Memory Utilization on $instance_id ($instance_name)" --alarm-description "Alarm when Memory exceeds 90 percent" --metric-name "Memory % Committed Bytes In Use" --namespace CWAgent --statistic Average --period $CRITICAL_PERIOD --threshold $CRITICAL_MEMORY --comparison-operator GreaterThanThreshold --dimensions "Name=InstanceId,Value=$instance_id" --evaluation-periods $CRITICAL_EVALPERIOD --alarm-actions ${SNS_TOPIC} --unit Percent --region ${REGION}; 
+done < create-alarms-windows-platform.txt; 
+
+   
+
+#DISK UTILIZATION 
+while read instance_id; read instance_name; 
+do aws cloudwatch put-metric-alarm --alarm-name "${CLIENT_ACCOUNT} - P2 - Critical Filesystem Root Utilization on $instance_id ($instance_name)" --alarm-description "Alarm when root exceeds 90 percent" --metric-name "LogicalDisk % Free Space" --namespace CWAgent --statistic Average --period $CRITICAL_PERIOD --threshold $CRITICAL_DISK --comparison-operator GreaterThanThreshold --dimensions "Name=InstanceId,Value=$instance_id" --evaluation-periods $CRITICAL_EVALPERIOD --alarm-actions ${SNS_TOPIC} --unit Percent --region ${REGION}; 
+done < create-alarms-windows-platform.txt; 
+
+
+
+
+
+#Create CloudWatch alarms for Linux Platform
+
+#CPU UTILIZATION
+while read instance_id; read instance_name;
+do aws cloudwatch put-metric-alarm --alarm-name "${CLIENT_ACCOUNT} - P2 - Critical CPU Utilization on $instance_id ($instance_name)" --alarm-description "Alarm when CPU exceeds 90 percent" --metric-name CPUUtilization --namespace AWS/EC2 --statistic Average --period $CRITICAL_PERIOD --threshold $CRITICAL_CPU --comparison-operator GreaterThanThreshold --dimensions "Name=InstanceId,Value=$instance_id" --evaluation-periods $CRITICAL_EVALPERIOD --alarm-actions ${SNS_TOPIC} --unit Percent --region ${REGION};
+done < create-alarms-linux-platform.txt;
+
+
+
+
+
+#STATUS CHECK FAILED
+while read instance_id; read instance_name;
+do aws cloudwatch put-metric-alarm --alarm-name "${CLIENT_ACCOUNT} - P1 - Critical Status Check Failed on $instance_id ($instance_name)" --alarm-description "Alarm when instance has status check failure" --metric-name StatusCheckFailed --namespace AWS/EC2 --statistic Maximum --period $CRITICAL_PERIOD --threshold 0 --comparison-operator GreaterThanThreshold --dimensions "Name=InstanceId,Value=$instance_id" --evaluation-periods $CRITICAL_EVALPERIOD --alarm-actions ${SNS_TOPIC} --unit Count --region ${REGION};
+done < create-alarms-linux-platform.txt;
+
+
+
+
+
+#MEMORY UTILIZATION
+while read instance_id; read instance_name;
+do aws cloudwatch put-metric-alarm --alarm-name "${CLIENT_ACCOUNT} - P2 - Critical Memory Utilization on $instance_id ($instance_name)" --alarm-description "Alarm when Memory exceeds 90 percent" --metric-name mem_used_percent --namespace CWAgent --statistic Average --period $CRITICAL_PERIOD --threshold $CRITICAL_MEMORY --comparison-operator GreaterThanThreshold --dimensions "Name=InstanceId,Value=$instance_id" --evaluation-periods $CRITICAL_EVALPERIOD --alarm-actions ${SNS_TOPIC} --unit Percent --region ${REGION};
+done < create-alarms-linux-platform.txt;
+
+
+
+
+
+#DISK UTILIZATION
+while read instance_id; read instance_name;
+do aws cloudwatch put-metric-alarm --alarm-name "${CLIENT_ACCOUNT} - P2 - Critical Filesystem Root Utilization on $instance_id ($instance_name)" --alarm-description "Alarm when root exceeds 90 percent" --metric-name disk_used_percent --namespace CWAgent --statistic Average --period $CRITICAL_PERIOD --threshold $CRITICAL_DISK --comparison-operator GreaterThanThreshold --dimensions "Name=InstanceId,Value=$instance_id" --evaluation-periods $CRITICAL_EVALPERIOD --alarm-actions ${SNS_TOPIC} --unit Percent --region ${REGION};
+done < create-alarms-linux-platform.txt;
