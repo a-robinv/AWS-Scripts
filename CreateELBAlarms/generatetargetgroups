@@ -1,23 +1,39 @@
 #!/bin/bash
-# "TargetGroup",
-# "LoadBalancer",
-# "AvailabilityZone"
-#Find wc value to edit the script
-# aws elbv2 describe-load-balancers --region ap-southeast-1 --query "LoadBalancers[].LoadBalancerArn" --output text > initiallist.txt
-# wc -w initiallist.txt to find 
+read -p 'Enter Priority Level' PRIORITY
 
-aws elbv2 describe-load-balancers --region ap-southeast-1 --query "LoadBalancers[].LoadBalancerArn" --output text \
-| awk '{ for (i=1; i<=NF; i++) printf "%s\n", $i }' > arnlist.txt
-
-#Generate Target group from Arnlist
-while read ARN;
-do aws elbv2 describe-target-groups --query "TargetGroups[].TargetGroupName" --load-balancer-arn ${ARN} >> targetgroups.txt;
-done < arnlist.txt;
+# # Generate ARN of LBs
+# aws elbv2 describe-load-balancers --region ap-southeast-1 --query "LoadBalancers[].LoadBalancerArn" --output text \
+# | awk '{ for (i=1; i<=NF; i++) printf "%s\n", $i }' > arnlist.txt
 
 
+# #Generate Target group from Arnlist
+# while read ARN;
+# do aws elbv2 describe-target-groups --query "TargetGroups[].TargetGroupArn" --load-balancer-arn ${ARN} --output text >> targetgroups.txt;
+# done < arnlist.txt;
 
+# # Remove the string 'arn:aws:elasticloadbalancing:ap-southeast-1:811348665611:loadbalancer/' from the ARN list
+# sed -i 's/arn:aws:elasticloadbalancing:ap-southeast-1:811348665611:loadbalancer\///g' arnlist.txt
 
-# Generate ARN of LB
-# aws elbv2 describe-load-balancers --region ap-southeast-1 --query "LoadBalancers[].LoadBalancerArn" --output text
-# Generate AZ and LB Name
-# aws elbv2 describe-load-balancers --region ap-southeast-1 --query "LoadBalancers[].[AvailabilityZones[].ZoneName, LoadBalancerName]" --output text
+# # Remove the string 'arn:aws:elasticloadbalancing:ap-southeast-1:811348665611:' from targetgroup txt arn
+# sed -i 's/arn:aws:elasticloadbalancing:ap-southeast-1:811348665611://g' targetgroups.txt
+
+# paste -d '\n' arnlist.txt targetgroups.txt | awk 'NF' > readfile.txt
+
+#Create Cloudwatch alarms
+while read LB; read TG;
+do aws cloudwatch put-metric-alarm \
+    --alarm-name "JFC-DT - $PRIORITY - Critical UnHealthyHostCount ($LB)" \
+    --alarm-description "unhealthy host count is greater than 0" \
+    --metric-name UnHealthyHostCount \
+    --namespace AWS/ApplicationELB \
+    --statistic Sum \
+    --period 300 \
+    --treat-missing-data notBreaching \
+    --threshold 0 \
+    --comparison-operator GreaterThanThreshold \
+    --dimensions Name='LoadBalancer',Value=\'${LB}\' Name='TargetGroup',Value=${TG} \
+    --evaluation-periods 1 \
+    --alarm-actions arn:aws:sns:ap-southeast-1:811348665611:ECV-MSP-Support \
+    --unit Count \
+    --region ap-southeast-1;
+done < readfile.txt;
