@@ -6,13 +6,13 @@
 # aws elbv2 describe-load-balancers --region ap-southeast-1 --query "LoadBalancers[].LoadBalancerArn" --output text > initiallist.txt
 # wc -w initiallist.txt to find 
 
-aws elbv2 describe-load-balancers --region ap-southeast-1 --query "LoadBalancers[].LoadBalancerArn" --output text | awk '{printf "%s\n%s\n%s\n%s\n%s\n%s\n", $1, $2, $3, $4, $5, $6}' > arnlist.txt
+aws elbv2 describe-load-balancers --region ap-southeast-1 --query "LoadBalancers[].LoadBalancerArn" --output text \
+| awk '{ for (i=1; i<=NF; i++) printf "%s\n", $i }' > arnlist.txt
 
 #Generate Target group from Arnlist
 while read ARN;
 do aws elbv2 describe-target-groups --query "TargetGroups[].TargetGroupName" --load-balancer-arn ${ARN} >> targetgroups.txt;
 done < arnlist.txt;
-
 
 
 
