@@ -1,0 +1,15 @@
+while IFS= read -r email; do
+    # Remove trailing newline character from email
+    email=$(echo "$email" | tr -d '\n')
+
+    json_filename="result.json"
+    
+    # Create JSON data
+    json_data="{\"emailAddress\": \"$email\",\"reason\":\"BOUNCE\"}"
+
+    # Write JSON data to the JSON file
+    echo "$json_data" >> "$json_filename"
+
+    echo "JSON file created for: $email"
+done < emails.txt;
+

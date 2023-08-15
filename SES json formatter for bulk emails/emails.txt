@@ -1,0 +1,4 @@
+sampleemail@gmail.com","reason":"BOUNCE"}
+sampleemail2@gmail.com","reason":"BOUNCE"}
+sampleemail3@gmail.com","reason":"BOUNCE"}
+sampleemail4@gmail.com","reason":"BOUNCE"}

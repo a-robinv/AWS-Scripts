@@ -1,0 +1,12 @@
+while read email;
+do 
+    json_filename="result.json"
+    
+    # Create JSON data
+    json_data="{\"emailAddress\": \"${email}"
+
+    # Write JSON data to the JSON file
+    echo "$json_data" >> "$json_filename"
+
+    echo "JSON file created for: $email"
+done < emails.txt;
