@@ -5,6 +5,7 @@ text_files = ['text1.txt', 'text2.txt']  # Add more file names as needed
 
 # Create a new Excel workbook
 workbook = openpyxl.Workbook()
+
 # Loop through the text files and add their contents to separate sheets
 for i, text_file in enumerate(text_files):
     sheet = workbook.create_sheet(title=f'Sheet{i+1}')
