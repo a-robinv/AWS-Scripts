@@ -4,12 +4,12 @@ Resources:
   EventRule:
     Type: "AWS::Events::Rule"
     Properties:
-      Name: "Lufthansa-aws-health-events"
+      Name: "Client-aws-health-events"
       Description: "A CloudWatch Event Rule that triggers on changes in the status of AWS Personal Health Dashboard (AWS Health) and forwards the events to the Centralized Event Bus."
       State: "ENABLED"
       Targets:
-        - Arn: "arn:aws:sns:ap-southeast-1:437399683240:ECV-MSP-Support"
-          Id: "Lufthansa-Centralized-AWS-Events"
+        - Arn: "arn:aws:sns:ap-southeast-1:111111111:ECV-MSP-Support"
+          Id: "Client-Centralized-AWS-Events"
       EventPattern:
         detail-type:
           - "AWS Health Event"

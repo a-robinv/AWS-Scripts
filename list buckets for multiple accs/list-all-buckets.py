@@ -2,7 +2,7 @@ import os
 import time
 import subprocess
 
-with open('JFC-Accounts-Roles.txt', 'r') as file: #This is an arbitrary text file inputted. This text files contains all the accounts we would assume as (eg: CLIENT/AdministratorAccess)
+with open('roles.txt', 'r') as file: #This is an arbitrary text file inputted. This text files contains all the accounts we would assume as (eg: CLIENT/AdministratorAccess)
     # Loop through each line in the file
     for client in file:
         # Process the current line

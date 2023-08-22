@@ -120,7 +120,7 @@ Parameters:
     - 'false'
   SNSNotificationTopic:
     Type: String
-    Default: 'arn:aws:sns:ap-southeast-1:437399683240:ECV-MSP-Support'
+    Default: 'arn:aws:sns:ap-southeast-1:1111111:ECV-MSP-Support'
     Description: "Local Admin SNS Topic"
 
 Conditions:
