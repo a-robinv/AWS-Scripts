@@ -1,0 +1,5 @@
+while read volume;
+do  
+    echo ${volume} >> inventory.txt;
+    aws ec2 describe-volumes --region ap-southeast-1 --volume-ids ${volume} --query 'Volumes[*].[Tags[?Key==`Name`].Value]' --output text >> inventory.txt; 
+done < volumelist.txt

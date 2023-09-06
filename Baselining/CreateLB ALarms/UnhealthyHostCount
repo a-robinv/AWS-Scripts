@@ -5,19 +5,17 @@ read -p 'Enter Priority Level' PRIORITY
 aws elbv2 describe-load-balancers --region ap-southeast-1 --query "LoadBalancers[].LoadBalancerArn" --output text \
 | awk '{ for (i=1; i<=NF; i++) printf "%s\n", $i }' > arnlist.txt
 
-
 #Generate Target group from Arnlist
 while read ARN;
 do aws elbv2 describe-target-groups --query "TargetGroups[].TargetGroupArn" --load-balancer-arn ${ARN} --output text >> targetgroups.txt;
-done < arnlist.txt;
-
-# Remove the string 'arn:aws:elasticloadbalancing:ap-southeast-1:811348665611:loadbalancer/' from the ARN list
-sed -i 's/arn:aws:elasticloadbalancing:ap-southeast-1:811348665611:loadbalancer\///g' arnlist.txt
+done < prod-arnlist.txt;
 
 # Remove the string 'arn:aws:elasticloadbalancing:ap-southeast-1:811348665611:' from targetgroup txt arn
 sed -i 's/arn:aws:elasticloadbalancing:ap-southeast-1:811348665611://g' targetgroups.txt
+# Remove the string 'arn:aws:elasticloadbalancing:ap-southeast-1:811348665611:loadbalancer/' from the ARN list
+sed -i 's/arn:aws:elasticloadbalancing:ap-southeast-1:811348665611:loadbalancer\///g' prod-arnlist.txt
 
-paste -d '\n' arnlist.txt targetgroups.txt | awk 'NF' > readfile.txt
+paste -d '\n' stg-arnlist.txt targetgroups.txt | awk 'NF' > readfile.txt
 
 #Create Cloudwatch alarms
 while read LB; read TG;

@@ -1,0 +1,56 @@
+read -p "Enter Priority, P3 for stg, P2 for prd " PRIORITY
+
+# These lines creates list of clusters that will be used to generate services list
+aws ecs list-clusters --query "clusterArns[]" --output text \
+| awk '{ for (i=1; i<=NF; i++) printf "%s\n", $i }' >> clusters.txt
+
+# string manipulation to clean data
+sed -i 's/arn:aws:ecs:ap-southeast-1:811348665611:cluster\///g' clusters.txt
+cat clusters.txt | grep stg > clusters-stg.txt
+
+# these lines of code below generate the list of services inside each clusters
+while read clustername;
+do aws ecs list-services --cluster ${clustername} --query "serviceArns[]" --output text \
+| awk '{ for (i=1; i<=NF; i++) printf "%s\n", $i }' >> services.txt;
+done < clusters-stg.txt;
+
+#string manipulation to prepare for reading
+sed -i 's/arn:aws:ecs:ap-southeast-1:811348665611:service\///g' services.txt
+
+cat services.txt | tr '/' '\n' > readfile.txt
+
+#Create Cloudwatch alarms
+while read ClusterName; read ServiceName;
+do aws cloudwatch put-metric-alarm \
+    --alarm-name "JFC-DT - $PRIORITY - High Memory utilization in $ServiceName under $ClusterName)" \
+    --alarm-description "Memory utilization of service in a cluster is exceeding threshold" \
+    --metric-name MemoryUtilization \
+    --namespace AWS/ECS \
+    --statistic Average \
+    --period 300 \
+    --threshold 80 \
+    --comparison-operator GreaterThanThreshold \
+    --dimensions Name='ClusterName',Value=\'${ClusterName}\' Name='ServiceName',Value=${ServiceName} \
+    --evaluation-periods 1 \
+    --alarm-actions arn:aws:sns:ap-southeast-1:811348665611:ECV-MSP-Support \
+    --unit Percent \
+    --region ap-southeast-1;
+done < readfile.txt;
+
+#Create Cloudwatch alarms
+while read ClusterName; read ServiceName;
+do aws cloudwatch put-metric-alarm \
+    --alarm-name "JFC-DT - $PRIORITY - High CPU utilization in $ServiceName under $ClusterName)" \
+    --alarm-description "CPU utilization of service in a cluster is exceeding threshold" \
+    --metric-name CPUUtilization \
+    --namespace AWS/ECS \
+    --statistic Average \
+    --period 300 \
+    --threshold 80 \
+    --comparison-operator GreaterThanThreshold \
+    --dimensions Name='ClusterName',Value=\'${ClusterName}\' Name='ServiceName',Value=${ServiceName} \
+    --evaluation-periods 1 \
+    --alarm-actions arn:aws:sns:ap-southeast-1:811348665611:ECV-MSP-Support \
+    --unit Percent \
+    --region ap-southeast-1;
+done < readfile.txt;

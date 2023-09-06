@@ -13,19 +13,19 @@ aws ec2 describe-instances \
   --query 'Reservations[*].Instances[*].[InstanceId, ImageId, InstanceType, Tags[?Key==`Name`].Value]' \
   --output text \
   --region ${REGION} \
-  | awk '{printf "%s\n%s\n%s\n%s\n", $1, $2, $3, $4}' \
+  | awk '{ for (i=1; i<=NF; i++) printf "%s\n", $i }' \
   >> metadata.txt
 aws ec2 describe-instances \
   --filters Name=platform-details,Values="Red Hat Enterprise Linux" "Name=tag:Environment,Values=${ENVIRONMENT}" \
   --query 'Reservations[*].Instances[*].[InstanceId, ImageId, InstanceType, Tags[?Key==`Name`].Value]' \
   --output text \
   --region ${REGION} \
-  | awk '{printf "%s\n%s\n%s\n%s\n", $1, $2, $3, $4}' \
+  | awk '{ for (i=1; i<=NF; i++) printf "%s\n", $i }' \
   >> metadata.txt
 aws ec2 describe-instances \
   --filters Name=platform-details,Values="SUSE Linux" "Name=tag:Environment,Values=${ENVIRONMENT}" \
   --query 'Reservations[*].Instances[*].[InstanceId, ImageId, InstanceType, Tags[?Key==`Name`].Value]' \
   --output text \
   --region ${REGION} \
-  | awk '{printf "%s\n%s\n%s\n%s\n", $1, $2, $3, $4}' \
+  | awk '{ for (i=1; i<=NF; i++) printf "%s\n", $i }' \
   >> metadata.txt

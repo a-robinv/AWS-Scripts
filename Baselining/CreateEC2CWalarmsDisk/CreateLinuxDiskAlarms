@@ -16,7 +16,7 @@ aws ec2 describe-instances \
   --query 'Reservations[*].Instances[*].[Tags[?Key==`Name`].Value | [0], InstanceId, ImageId, InstanceType]' \
   --output text \
   --region ${REGION} \
-  | awk '{printf "%s\n%s\n%s\n%s\n", $1, $2, $3, $4}' \
+  | awk '{ for (i=1; i<=NF; i++) printf "%s\n", $i }' \
   >> metadata.txt
 
 aws ec2 describe-instances \
@@ -24,7 +24,7 @@ aws ec2 describe-instances \
   --query 'Reservations[*].Instances[*].[Tags[?Key==`Name`].Value | [0], InstanceId, ImageId, InstanceType]' \
   --output text \
   --region ${REGION} \
-  | awk '{printf "%s\n%s\n%s\n%s\n", $1, $2, $3, $4}' \
+  | awk '{ for (i=1; i<=NF; i++) printf "%s\n", $i }' \
   >> metadata.txt
 
 aws ec2 describe-instances \
@@ -32,7 +32,7 @@ aws ec2 describe-instances \
   --query 'Reservations[*].Instances[*].[Tags[?Key==`Name`].Value | [0], InstanceId, ImageId, InstanceType]' \
   --output text \
   --region ${REGION} \
-  | awk '{printf "%s\n%s\n%s\n%s\n", $1, $2, $3, $4}' \
+  | awk '{ for (i=1; i<=NF; i++) printf "%s\n", $i }' \
   >> metadata.txt
 
 while read instance_name; read instance_id; read image_id; read instance_type;
