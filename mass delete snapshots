@@ -1,0 +1,14 @@
+read -p "Enter AWS Account ID " AccountId
+read -p "Enter Region " Region
+
+comm -23 <(aws ec2 describe-snapshots --region ${Region} --owner-ids ${AccountId} \
+--query 'Snapshots[*].SnapshotId' --output text | tr '\t' '\n' | sort) <(aws ec2 describe-images \
+--region ${Region} --owners ${AccountId} --query 'Images[*].BlockDeviceMappings[*].Ebs.SnapshotId' \
+--output text | tr '\t' '\n' | sort) | awk '{ for (i=1; i<=NF; i++) printf "%s\n", $i }' > orphanedlist.txt
+
+while read snapshots;
+do 
+    echo "deleting snapshot ${snapshots}"
+    aws ec2 delete-snapshot --snapshot-id ${snapshots} --region ${Region};
+    echo "deleted ${snapshots}"
+done < orphanedlist.txt
