@@ -1,0 +1,26 @@
+#!/bin/bash
+read -p 'Account Alias: ' Account
+read -p 'SNS topic ARN: ' SNS
+
+# List all Lambda functions
+lambda_functions=$(aws lambda list-functions --query "Functions[*].FunctionName" --output json)
+
+# Loop through each Lambda function and create CloudWatch alarms
+for function_name in $(echo $lambda_functions | jq -r '.[]'); do
+  echo "Creating CloudWatch alarm for Lambda function: $function_name"
+  aws cloudwatch put-metric-alarm \
+    --alarm-name "UnoBank ($Account) - P2 - ThrottleAlarm-$function_name" \
+    --alarm-description "Alarm for Throttles on Lambda function $function_name" \
+    --metric-name "Throttles" \
+    --namespace "AWS/Lambda" \
+    --statistic "Sum" \
+    --period 300 \
+    --threshold 1 \
+    --treat-missing-data notBreaching \
+    --comparison-operator "GreaterThanOrEqualToThreshold" \
+    --evaluation-periods 1 \
+    --alarm-actions "$SNS" \
+    --dimensions "Name=FunctionName,Value=$function_name"
+done
+
+echo "All alarms created successfully."
