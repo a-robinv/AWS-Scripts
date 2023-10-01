@@ -1,0 +1,14 @@
+aws rds create-db-snapshot \
+--region ap-northeast-1 \
+--db-instance-identifier ravpoc-copied \
+--db-snapshot-identifier ravpoc-copied-snapshot-01 \
+--kms-key-id arn:aws:kms:ap-northeast-1:083341655278:key/mrk-7de7d817abb44387ae86b720b4f2a8ee
+
+
+aws rds start-export-task \
+--export-task-identifier ravpoc-copied-autoexport-01 \
+--source-arn arn:aws:rds:ap-northeast-1:083341655278:snapshot:rav-poc-copied \
+--s3-bucket-name rav-hcx \
+--s3-prefix autoexport/09-25-23-0001 \
+--iam-role-arn arn:aws:iam::083341655278:role/rds-s3-export-role \
+--kms-key-id arn:aws:kms:ap-northeast-1:083341655278:key/mrk-7de7d817abb44387ae86b720b4f2a8ee
