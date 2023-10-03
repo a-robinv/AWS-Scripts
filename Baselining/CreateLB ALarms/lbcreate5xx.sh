@@ -6,7 +6,7 @@ aws elbv2 describe-load-balancers --region ap-southeast-1 --query "LoadBalancers
 
 # string manip
 
-sed -i 's/arn:aws:elasticloadbalancing:ap-southeast-1:811348665611:loadbalancer\///g' arnlist.txt
+sed -i 's/arn:aws:elasticloadbalancing:ap-southeast-1:xxxxxxxx:loadbalancer\///g' arnlist.txt
 
 #For custom Priorities for stg and prd environment, use grep to differentiate the arnlist, and run by environment
 
@@ -24,7 +24,7 @@ do aws cloudwatch put-metric-alarm \
     --comparison-operator GreaterThanThreshold \
     --dimensions Name='LoadBalancer',Value=\'{$LB}\' \
     --evaluation-periods 1 \
-    --alarm-actions arn:aws:sns:ap-southeast-1:811348665611:ECV-MSP-Support \
+    --alarm-actions arn:aws:sns:ap-southeast-1:xxxxxxxx:SNS-NAME \
     --unit Count \
     --region ap-southeast-1;
 done < arnlist.txt;

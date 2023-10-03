@@ -10,10 +10,10 @@ while read ARN;
 do aws elbv2 describe-target-groups --query "TargetGroups[].TargetGroupArn" --load-balancer-arn ${ARN} --output text >> targetgroups.txt;
 done < prod-arnlist.txt;
 
-# Remove the string 'arn:aws:elasticloadbalancing:ap-southeast-1:811348665611:' from targetgroup txt arn
-sed -i 's/arn:aws:elasticloadbalancing:ap-southeast-1:811348665611://g' targetgroups.txt
-# Remove the string 'arn:aws:elasticloadbalancing:ap-southeast-1:811348665611:loadbalancer/' from the ARN list
-sed -i 's/arn:aws:elasticloadbalancing:ap-southeast-1:811348665611:loadbalancer\///g' prod-arnlist.txt
+# Remove the string 'arn:aws:elasticloadbalancing:ap-southeast-1:xxxxxxxx:' from targetgroup txt arn
+sed -i 's/arn:aws:elasticloadbalancing:ap-southeast-1:xxxxxxxx://g' targetgroups.txt
+# Remove the string 'arn:aws:elasticloadbalancing:ap-southeast-1:xxxxxxxx:loadbalancer/' from the ARN list
+sed -i 's/arn:aws:elasticloadbalancing:ap-southeast-1:xxxxxxxx:loadbalancer\///g' prod-arnlist.txt
 
 paste -d '\n' stg-arnlist.txt targetgroups.txt | awk 'NF' > readfile.txt
 
@@ -31,7 +31,7 @@ do aws cloudwatch put-metric-alarm \
     --comparison-operator GreaterThanThreshold \
     --dimensions Name='LoadBalancer',Value=\'${LB}\' Name='TargetGroup',Value=${TG} \
     --evaluation-periods 1 \
-    --alarm-actions arn:aws:sns:ap-southeast-1:811348665611:ECV-MSP-Support \
+    --alarm-actions arn:aws:sns:ap-southeast-1:xxxxxxxx:SNS-NAME \
     --unit Count \
     --region ap-southeast-1;
 done < readfile.txt;

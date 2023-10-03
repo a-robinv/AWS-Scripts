@@ -8,7 +8,7 @@ Resources:
       Description: "A CloudWatch Event Rule that triggers on changes in the status of AWS Personal Health Dashboard (AWS Health) and forwards the events to the Centralized Event Bus."
       State: "ENABLED"
       Targets:
-        - Arn: "arn:aws:sns:ap-southeast-1:111111111:ECV-MSP-Support"
+        - Arn: "arn:aws:sns:ap-southeast-1:1111111:SNS-NAME"
           Id: "Client-Centralized-AWS-Events"
       EventPattern:
         detail-type:
