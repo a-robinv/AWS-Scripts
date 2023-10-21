@@ -23,13 +23,17 @@ resource "aws_vpc" "vpc" {
     Environment = "RAV-POC"
   }
 }
+########################
+data "aws_availability_zones" "available" {}
+
+######################
 
 # Create subnets in each VPC labeled as "SubnetA"
 resource "aws_subnet" "subnetA" {
   count = length(var.vpc_cidr_blocks)
   vpc_id = aws_vpc.vpc[count.index].id
   cidr_block = cidrsubnet(var.vpc_cidr_blocks[count.index], 8, count.index * 2) # Generate unique CIDR blocks for SubnetA
-
+  availability_zone = "${data.aws_availability_zones.available.names[0]}"
   tags = {
     Name = "SubnetA-${count.index}"
     Environment = "RAV-POC"
@@ -41,7 +45,7 @@ resource "aws_subnet" "subnetB" {
   count = length(var.vpc_cidr_blocks)
   vpc_id = aws_vpc.vpc[count.index].id
   cidr_block = cidrsubnet(var.vpc_cidr_blocks[count.index], 8, (count.index * 2) + 1) # Generate unique CIDR blocks for SubnetB
-
+  availability_zone = "${data.aws_availability_zones.available.names[1]}"
   tags = {
     Name = "SubnetB-${count.index}"
     Environment = "RAV-POC"
