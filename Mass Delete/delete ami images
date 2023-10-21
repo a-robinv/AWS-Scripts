@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# run this command on AWS cloudshell
+
 aws ec2 describe-images \
     --region ap-southeast-1 \
     --query "Images[?CreationDate<'2023-07-11'].{ID:ImageId,Name:Name,CreationDate:CreationDate}" \

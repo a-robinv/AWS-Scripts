@@ -16,5 +16,5 @@ security-tooling
 shared-service
 Audit
 Log-Archive
-nx-unodigitalbank-prod
-sea166
+nx-xxxxx-prod
+seaxxx

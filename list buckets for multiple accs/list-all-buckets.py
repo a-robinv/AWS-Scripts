@@ -2,7 +2,10 @@ import os
 import time
 import subprocess
 
-with open('roles.txt', 'r') as file: #This is an arbitrary text file inputted. This text files contains all the accounts we would assume as (eg: CLIENT/AdministratorAccess)
+#  Setup 'assume by granted' a CLI app for AWS
+#  list.txt are the list of aws-cli profile which where we'll extract the s3 lists
+
+with open('list.txt', 'r') as file: #This is an arbitrary text file inputted. This text files contains all the accounts we would assume as (eg: CLIENT/AdministratorAccess)
     # Loop through each line in the file
     for client in file:
         # Process the current line

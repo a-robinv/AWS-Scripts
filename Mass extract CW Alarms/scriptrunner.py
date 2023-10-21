@@ -2,6 +2,9 @@ import os
 import time
 import subprocess
 
+#  Setup 'assume by granted' a CLI app for AWS
+#  list2.txt are the list of aws-cli profile setup which where we'll extract the cw alarms
+
 with open('list2.txt', 'r') as file: #This is an arbitrary text file inputted. This text files contains all the accounts we would assume as (eg: CLIENT/AdministratorAccess)
     # Loop through each line in the file
     for client in file:

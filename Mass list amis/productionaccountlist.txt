@@ -4,6 +4,6 @@ iexceed-prod/AWSAdministratorAccess
 integration-prod/AWSAdministratorAccess
 logging-monitoring-prod/AWSAdministratorAccess
 network-prod/AWSAdministratorAccess
-nx-unodigitalbank-prod/AWSAdministratorAccess
+nx-xxxxxxxk-prod/AWSAdministratorAccess
 security-tooling/AWSAdministratorAccess
 shared-service/AWSAdministratorAccess
