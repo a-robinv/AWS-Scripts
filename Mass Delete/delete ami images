@@ -1,9 +1,19 @@
 #!/bin/bash
+
 aws ec2 describe-images \
     --region ap-southeast-1 \
-    --query "Images[?CreationDate<'2023-08-01'].{ID:ImageId,Name:Name,CreationDate:CreationDate}" \
+    --query "Images[?CreationDate<'2023-07-11'].{ID:ImageId,Name:Name,CreationDate:CreationDate}" \
+    --filters Name=is-public,Values="false" \
+    --output text > privateimagelist.txt
+
+aws ec2 describe-images \
+    --region ap-southeast-1 \
+    --query "Images[?CreationDate<'2023-07-11'].{ID:ImageId}" \
+    --filters Name=is-public,Values="false" \
     --output text > images.txt
 
 while read images;
-do aws ec2 deregister-image --image-id $images --region ap-southeast-1;
+do 
+    aws ec2 deregister-image --image-id $images --region ap-southeast-1;
+    echo "deleted ${images}" >> deleted.txt;
 done < images.txt

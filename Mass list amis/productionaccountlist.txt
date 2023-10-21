@@ -1,0 +1,9 @@
+custom-apps-prod/AWSAdministratorAccess
+data-ingestion-prod/AWSAdministratorAccess
+iexceed-prod/AWSAdministratorAccess
+integration-prod/AWSAdministratorAccess
+logging-monitoring-prod/AWSAdministratorAccess
+network-prod/AWSAdministratorAccess
+nx-unodigitalbank-prod/AWSAdministratorAccess
+security-tooling/AWSAdministratorAccess
+shared-service/AWSAdministratorAccess

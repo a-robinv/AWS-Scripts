@@ -3,6 +3,7 @@ read -p "Enter Customer Account Name(CLIENTNAME-ALIAS): " CLIENT_ACCOUNT
 read -p "Enter SNS TOPIC " SNS_TOPIC
 read -p "Enter Region " REGION
 read -p "Enter Environment " ENVIRONMENT
+read -p "Enter Priority" PRIORITY
 CRITICAL_CPU="80"
 CRITICAL_MEMORY="80"
 CRITICAL_DISK="80"
@@ -17,19 +18,19 @@ aws ec2 describe-instances --filters "Name=platform,Values=windows" "Name=tag:En
 #Create CloudWatch alarms for Windows Platform
 #CPU UTILIZATION 
 while read instance_id; read instance_name; 
-do aws cloudwatch put-metric-alarm --alarm-name "${CLIENT_ACCOUNT} - P3 - Critical CPU Utilization on $instance_id ($instance_name)" --alarm-description "Alarm when CPU exceeds threshold" --metric-name CPUUtilization --namespace AWS/EC2 --statistic Average --period $CRITICAL_PERIOD --threshold $CRITICAL_CPU --comparison-operator GreaterThanThreshold --dimensions "Name=InstanceId,Value=$instance_id" --evaluation-periods $CRITICAL_EVALPERIOD --alarm-actions ${SNS_TOPIC} --unit Percent --region ${REGION}; 
+do aws cloudwatch put-metric-alarm --alarm-name "${CLIENT_ACCOUNT} - ${PRIORITY} - Critical CPU Utilization on $instance_id ($instance_name)" --alarm-description "Alarm when CPU exceeds threshold" --metric-name CPUUtilization --namespace AWS/EC2 --statistic Average --period $CRITICAL_PERIOD --threshold $CRITICAL_CPU --comparison-operator GreaterThanThreshold --dimensions "Name=InstanceId,Value=$instance_id" --evaluation-periods $CRITICAL_EVALPERIOD --alarm-actions ${SNS_TOPIC} --unit Percent --region ${REGION}; 
 done < create-alarms-windows-platform.txt;  
 #STATUS CHECK FAILED 
 while read instance_id; read instance_name; 
-do aws cloudwatch put-metric-alarm --alarm-name "${CLIENT_ACCOUNT} - P3 - Critical Status Check Failed on $instance_id ($instance_name)" --alarm-description "Alarm when instance has status check failure" --metric-name StatusCheckFailed --namespace AWS/EC2 --statistic Maximum --period $CRITICAL_PERIOD --threshold 0 --comparison-operator GreaterThanThreshold --dimensions "Name=InstanceId,Value=$instance_id" --evaluation-periods $CRITICAL_EVALPERIOD --alarm-actions ${SNS_TOPIC} --unit Count --region ${REGION}; 
+do aws cloudwatch put-metric-alarm --alarm-name "${CLIENT_ACCOUNT} - ${PRIORITY} - Critical Status Check Failed on $instance_id ($instance_name)" --alarm-description "Alarm when instance has status check failure" --metric-name StatusCheckFailed --namespace AWS/EC2 --statistic Maximum --period $CRITICAL_PERIOD --threshold 0 --comparison-operator GreaterThanThreshold --dimensions "Name=InstanceId,Value=$instance_id" --evaluation-periods $CRITICAL_EVALPERIOD --alarm-actions ${SNS_TOPIC} --unit Count --region ${REGION}; 
 done < create-alarms-windows-platform.txt; 
 
 #Create CloudWatch alarms for Linux Platform
 #CPU UTILIZATION
 while read instance_id; read instance_name;
-do aws cloudwatch put-metric-alarm --alarm-name "${CLIENT_ACCOUNT} - P3 - Critical CPU Utilization on $instance_id ($instance_name)" --alarm-description "Alarm when CPU exceeds threshold" --metric-name CPUUtilization --namespace AWS/EC2 --statistic Average --period $CRITICAL_PERIOD --threshold $CRITICAL_CPU --comparison-operator GreaterThanThreshold --dimensions "Name=InstanceId,Value=$instance_id" --evaluation-periods $CRITICAL_EVALPERIOD --alarm-actions ${SNS_TOPIC} --unit Percent --region ${REGION};
+do aws cloudwatch put-metric-alarm --alarm-name "${CLIENT_ACCOUNT} - ${PRIORITY} - Critical CPU Utilization on $instance_id ($instance_name)" --alarm-description "Alarm when CPU exceeds threshold" --metric-name CPUUtilization --namespace AWS/EC2 --statistic Average --period $CRITICAL_PERIOD --threshold $CRITICAL_CPU --comparison-operator GreaterThanThreshold --dimensions "Name=InstanceId,Value=$instance_id" --evaluation-periods $CRITICAL_EVALPERIOD --alarm-actions ${SNS_TOPIC} --unit Percent --region ${REGION};
 done < create-alarms-linux-platform.txt;
 #STATUS CHECK FAILED
 while read instance_id; read instance_name;
-do aws cloudwatch put-metric-alarm --alarm-name "${CLIENT_ACCOUNT} - P3 - Critical Status Check Failed on $instance_id ($instance_name)" --alarm-description "Alarm when instance has status check failure" --metric-name StatusCheckFailed --namespace AWS/EC2 --statistic Maximum --period $CRITICAL_PERIOD --threshold 0 --comparison-operator GreaterThanThreshold --dimensions "Name=InstanceId,Value=$instance_id" --evaluation-periods $CRITICAL_EVALPERIOD --alarm-actions ${SNS_TOPIC} --unit Count --region ${REGION};
+do aws cloudwatch put-metric-alarm --alarm-name "${CLIENT_ACCOUNT} - ${PRIORITY} - Critical Status Check Failed on $instance_id ($instance_name)" --alarm-description "Alarm when instance has status check failure" --metric-name StatusCheckFailed --namespace AWS/EC2 --statistic Maximum --period $CRITICAL_PERIOD --threshold 0 --comparison-operator GreaterThanThreshold --dimensions "Name=InstanceId,Value=$instance_id" --evaluation-periods $CRITICAL_EVALPERIOD --alarm-actions ${SNS_TOPIC} --unit Count --region ${REGION};
 done < create-alarms-linux-platform.txt;
