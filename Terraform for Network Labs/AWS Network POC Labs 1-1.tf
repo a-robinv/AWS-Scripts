@@ -93,6 +93,7 @@ resource "aws_instance" "ec2_instance" {
   subnet_id     = aws_subnet.subnetA[count.index].id # Associate with subnets
   security_groups = [aws_security_group.allow_ssh[count.index].id]
   key_name = "ravosaka"
+  associate_public_ip_address = "true"
   tags = {
     Name = "EC2-Instance-${count.index}"
     Environment = "POC"
