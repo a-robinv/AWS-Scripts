@@ -78,9 +78,40 @@ resource "aws_security_group" "allow_ssh" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
   tags = {
     Name = "SecurityGroup-${count.index}"
+    Environment = "RAV-POC"
+  }
+}
+
+resource "aws_security_group" "allow_native_resource" {
+  count       = 3
+  name = "allow_native_resource"
+  description = "Allow native resource traffic"
+  vpc_id      = aws_vpc.vpc[count.index].id
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["10.0.0.0/8"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "icmp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "SecurityGroup-Native"
     Environment = "RAV-POC"
   }
 }
@@ -91,7 +122,7 @@ resource "aws_instance" "ec2_instance" {
   ami           = "ami-04b4d38c86a77bccc" # Replace with your desired AMI ID
   instance_type = "t3.micro"          # Choose an appropriate instance type
   subnet_id     = aws_subnet.subnetA[count.index].id # Associate with subnets
-  security_groups = [aws_security_group.allow_ssh[count.index].id]
+  security_groups = [aws_security_group.allow_ssh[count.index].id, aws_security_group.allow_native_resource[count.index].id] # Add both security groups
   key_name = "ravosaka"
   associate_public_ip_address = "true"
   tags = {
@@ -99,3 +130,4 @@ resource "aws_instance" "ec2_instance" {
     Environment = "POC"
   }
 }
+
