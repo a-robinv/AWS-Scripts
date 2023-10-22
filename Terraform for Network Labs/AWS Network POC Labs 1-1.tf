@@ -92,7 +92,7 @@ resource "aws_instance" "ec2_instance" {
   instance_type = "t3.micro"          # Choose an appropriate instance type
   subnet_id     = aws_subnet.subnetA[count.index].id # Associate with subnets
   security_groups = [aws_security_group.allow_ssh[count.index].id]
-
+  key_name = "ravosaka"
   tags = {
     Name = "EC2-Instance-${count.index}"
     Environment = "POC"
