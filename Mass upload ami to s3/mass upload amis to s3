@@ -1,0 +1,4 @@
+while read name; read ami;
+do aws ec2 export-image --region ap-southeast-1 --image-id ${ami} --disk-image-format RAW --s3-export-location S3Bucket=backupdownloadbucket,S3Prefix=${name}/;
+done < list.txt
+
