@@ -1,3 +1,4 @@
+# make sure to remove metadata.txt first if it's already existing
 #Set the value of parameters
 read -p "Enter Customer Account Name(CLIENTNAME-ALIAS): " CLIENT_ACCOUNT
 read -p "Enter SNS TOPIC: " SNS_TOPIC
