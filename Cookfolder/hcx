@@ -1,7 +1,7 @@
 aws rds create-db-snapshot \
---region ap-northeast-1 \
---db-instance-identifier ravpoc-copied \
---db-snapshot-identifier ravpoc-copied-snapshot-01 \
+--region ap-southeast-1 \
+--db-instance-identifier arn:aws:rds:ap-southeast-xxxxx6:snxxxxxx1 \
+--db-snapshot-identifier dbammt-final-snapshotxxxxx6 \
 --kms-key-id arn:aws:kms:ap-northeast-1:xxxxxxxxxxxxxx:key/mrk-7de7d817abb44387xxxxxxxxxxxxxx
 
 aws rds describe-db-snapshots \
@@ -15,4 +15,10 @@ aws rds start-export-task \
 --s3-bucket-name rav-hcx \
 --s3-prefix autoexport/10-09-23-0001 \
 --iam-role-arn arn:aws:iam::xxxxxxxxxxxxxx:role/rds-s3-export-role \
---kms-key-id arn:aws:kms:ap-northeast-1:xxxxxxxxxxxxxx:key/mrk-7de7d817abb44387xxxxxxxxxxxxxx
+--kms-key-id arn:aws:kms:ap-northeast-1:xxxxxxxxxxxxxx:key/mrk-7dexxxxxxxxxxxxxxxx
+
+aws rds copy-db-snapshot \
+--region ap-southeast-1 \
+--source-db-snapshot-identifier arn:aws:rds:ap-southeast-1:xxxxy \
+--target-db-snapshot-identifier 89xxxxx86 \
+--kms-key-id arn:aws:kms:ap-southeast-1:574487505001:key/3
